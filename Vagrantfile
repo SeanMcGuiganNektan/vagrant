@@ -12,7 +12,23 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
+  
   config.vm.box = "puphpet/centos65-x64"
+  
+  config.vm.define "esmaster01" do |esmaster01|
+    config.vm.hostname = "esmaster01"
+    config.vm.network "private_network", ip:  "10.0.2.10"
+    #  config.vm.provision :shell, path: "bootstrap_apache.sh"
+    #  config.vm.network :forwarded_port, guest: 80, host: 8080
+  end
+
+  config.vm.define "esdata01" do |esdata01|
+    config.vm.hostname = "esdata01"
+    config.vm.network "private_network", ip:  "10.0.2.11"
+    #  config.vm.provision :shell, path: "bootstrap_apache.sh"
+    #  config.vm.network :forwarded_port, guest: 80, host: 8080
+  end
+
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
