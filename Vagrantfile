@@ -14,21 +14,52 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
   
   config.vm.box = "puphpet/centos65-x64"
+  config.ssh.username = "admin"
+
   
-  config.vm.define "esmaster01" do |esmaster01|
-    config.vm.hostname = "esmaster01"
+  config.vm.define "haproxy01" do |ha01|
+    config.vm.hostname = "ha01"
     config.vm.network "private_network", ip:  "10.0.2.10"
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
     #  config.vm.network :forwarded_port, guest: 80, host: 8080
+    ha01.vm.provider :virtualbox do |vb|
+        vb.customize ["modifyvm", :id, "--memory", "1024"]
+        vb.customize ["modifyvm", :id, "--cpus", "2"]
+      end
   end
 
-  config.vm.define "esdata01" do |esdata01|
-    config.vm.hostname = "esdata01"
+  config.vm.define "webserver01" do |web01|
+    config.vm.hostname = "web01"
     config.vm.network "private_network", ip:  "10.0.2.11"
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
     #  config.vm.network :forwarded_port, guest: 80, host: 8080
+    web01.vm.provider :virtualbox do |vb|
+        vb.customize ["modifyvm", :id, "--memory", "1024"]
+        vb.customize ["modifyvm", :id, "--cpus", "1"]
+      end
   end
 
+   config.vm.define "webserver02" do |web02|
+    config.vm.hostname = "web02"
+    config.vm.network "private_network", ip:  "10.0.2.12"
+    #  config.vm.provision :shell, path: "bootstrap_apache.sh"
+    #  config.vm.network :forwarded_port, guest: 80, host: 8080
+    web02.vm.provider :virtualbox do |vb|
+        vb.customize ["modifyvm", :id, "--memory", "1024"]
+        vb.customize ["modifyvm", :id, "--cpus", "1"]
+      end
+  end
+
+   config.vm.define "webserver03" do |web03|
+    config.vm.hostname = "web03"
+    config.vm.network "private_network", ip:  "10.0.2.13"
+    #  config.vm.provision :shell, path: "bootstrap_apache.sh"
+    #  config.vm.network :forwarded_port, guest: 80, host: 8080
+    web03.vm.provider :virtualbox do |vb|
+        vb.customize ["modifyvm", :id, "--memory", "1024"]
+        vb.customize ["modifyvm", :id, "--cpus", "1"]
+      end
+  end
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
