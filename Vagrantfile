@@ -13,53 +13,111 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   
-  config.vm.box = "puphpet/centos65-x64"
-  config.ssh.username = "admin"
+  # config.vm.box = "puphpet/centos65-x64"
+  # config.vm.box =  "ubuntu/trusty64" 
+  config.vm.box = "hashicorp/precise64"
+  config.vm.boot_timeout = 300
+
+  config.vm.network "private_network", type: "dhcp"
+ 
+  config.hostmanager.enabled = true
+  config.hostmanager.ip_resolver = proc do |vm, resolving_vm|
+    if vm.id
+      `VBoxManage guestproperty get #{vm.id} "/VirtualBox/GuestInfo/Net/1/V4/IP"`.split()[1]
+    end
+  end
+
+  # config.ssh.username = "admin"
 
   
   config.vm.define "haproxy01" do |ha01|
     config.vm.hostname = "ha01"
-    config.vm.network "private_network", ip:  "10.0.2.10"
+    #  config.vm.network :private_network, ip: "10.0.2.10"
+    
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
     #  config.vm.network :forwarded_port, guest: 80, host: 8080
+    
     ha01.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "2"]
-      end
+    end
+    config.vm.provision "chef_zero" do |chef|
+        chef.node_name = "haproxy01"
+        # Specify the local paths where Chef data is stored
+        chef.cookbooks_path = "./cookbooks"
+        chef.data_bags_path = "./data_bags"
+        chef.nodes_path = "./nodes"
+        chef.roles_path = "./roles"
+        # Add a recipe
+        chef.add_recipe "haproxy"
+
+        # Or maybe a role
+        # chef.add_role "web"
+    end
   end
 
   config.vm.define "webserver01" do |web01|
-    config.vm.hostname = "web01"
-    config.vm.network "private_network", ip:  "10.0.2.11"
+  config.vm.hostname = "web01"
+    # config.vm.network :private_network, ip: "10.0.2.20"
+  
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
     #  config.vm.network :forwarded_port, guest: 80, host: 8080
+  
     web01.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "1"]
-      end
+    end
+    config.vm.provision "chef_zero" do |chef|
+        chef.node_name = "web01"
+        # Specify the local paths where Chef data is stored
+        chef.cookbooks_path = "./cookbooks"
+        chef.data_bags_path = "./data_bags"
+        chef.nodes_path = "./nodes"
+        chef.roles_path = "./roles"
+        # Add a recipe
+        chef.add_recipe "haproxy"
+
+        # Or maybe a role
+        # chef.add_role "web"
+    end
   end
 
    config.vm.define "webserver02" do |web02|
     config.vm.hostname = "web02"
-    config.vm.network "private_network", ip:  "10.0.2.12"
+    #  config.vm.network :private_network, ip: "10.0.2.30"
+    
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
     #  config.vm.network :forwarded_port, guest: 80, host: 8080
+    
     web02.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "1"]
-      end
+    end
+    config.vm.provision "chef_zero" do |chef|
+        chef.node_name = "web02"
+        # Specify the local paths where Chef data is stored
+        chef.cookbooks_path = "./cookbooks"
+        chef.data_bags_path = "./data_bags"
+        chef.nodes_path = "./nodes"
+        chef.roles_path = "./roles"
+        # Add a recipe
+        chef.add_recipe "haproxy"
+
+        # Or maybe a role
+        # chef.add_role "web"
+    end    
   end
 
-   config.vm.define "webserver03" do |web03|
-    config.vm.hostname = "web03"
-    config.vm.network "private_network", ip:  "10.0.2.13"
-    #  config.vm.provision :shell, path: "bootstrap_apache.sh"
-    #  config.vm.network :forwarded_port, guest: 80, host: 8080
-    web03.vm.provider :virtualbox do |vb|
-        vb.customize ["modifyvm", :id, "--memory", "1024"]
-        vb.customize ["modifyvm", :id, "--cpus", "1"]
-      end
-  end
+  # config.vm.define "webserver03" do |web03|
+  #  config.vm.hostname = "web03"
+  #  config.vm.network :private_network, ip: "10.0.2.40"
+  #  #  config.vm.provision :shell, path: "bootstrap_apache.sh"
+  #  #  config.vm.network :forwarded_port, guest: 80, host: 8080
+  #  web03.vm.provider :virtualbox do |vb|
+  #      vb.customize ["modifyvm", :id, "--memory", "1024"]
+  #      vb.customize ["modifyvm", :id, "--cpus", "1"]
+  #    end
+  #end
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
