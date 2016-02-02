@@ -21,6 +21,8 @@ Vagrant.configure(2) do |config|
   config.vm.network "private_network", type: "dhcp"
  
   config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+
   config.hostmanager.ip_resolver = proc do |vm, resolving_vm|
     if vm.id
       `VBoxManage guestproperty get #{vm.id} "/VirtualBox/GuestInfo/Net/1/V4/IP"`.split()[1]
@@ -29,11 +31,9 @@ Vagrant.configure(2) do |config|
 
   # config.ssh.username = "admin"
 
-  
-  config.vm.define "haproxy01" do |ha01|
+  config.vm.define "ha01" do |ha01|
     config.vm.hostname = "ha01"
     #  config.vm.network :private_network, ip: "10.0.2.10"
-    
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
     #  config.vm.network :forwarded_port, guest: 80, host: 8080
     
@@ -41,6 +41,7 @@ Vagrant.configure(2) do |config|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "2"]
     end
+    
     config.vm.provision "chef_zero" do |chef|
         chef.node_name = "haproxy01"
         # Specify the local paths where Chef data is stored
@@ -49,24 +50,27 @@ Vagrant.configure(2) do |config|
         chef.nodes_path = "./nodes"
         chef.roles_path = "./roles"
         # Add a recipe
-        chef.add_recipe "haproxy"
+        # chef.add_recipe "haproxy"
 
         # Or maybe a role
-        # chef.add_role "web"
+        chef.add_role "loadbalancer"
     end
   end
 
-  config.vm.define "webserver01" do |web01|
+  #webhosts = [:web01, :web02]
+  #webhosts.each do |host|
+
+  config.vm.define "web01" do |web01|
   config.vm.hostname = "web01"
-    # config.vm.network :private_network, ip: "10.0.2.20"
-  
+    #  config.vm.network :private_network, ip: "10.0.2.20"
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
-    #  config.vm.network :forwarded_port, guest: 80, host: 8080
+    config.vm.network "forwarded_port", guest: 80, host: 8080
   
     web01.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "1"]
     end
+    
     config.vm.provision "chef_zero" do |chef|
         chef.node_name = "web01"
         # Specify the local paths where Chef data is stored
@@ -75,24 +79,24 @@ Vagrant.configure(2) do |config|
         chef.nodes_path = "./nodes"
         chef.roles_path = "./roles"
         # Add a recipe
-        chef.add_recipe "haproxy"
+        # chef.add_recipe "haproxy"
 
         # Or maybe a role
-        # chef.add_role "web"
+        chef.add_role "webserver"
     end
   end
 
-   config.vm.define "webserver02" do |web02|
+   config.vm.define "web02" do |web02|
     config.vm.hostname = "web02"
     #  config.vm.network :private_network, ip: "10.0.2.30"
-    
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
-    #  config.vm.network :forwarded_port, guest: 80, host: 8080
+    config.vm.network "forwarded_port", guest: 80, host: 8081
     
     web02.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "1"]
     end
+    
     config.vm.provision "chef_zero" do |chef|
         chef.node_name = "web02"
         # Specify the local paths where Chef data is stored
@@ -101,10 +105,10 @@ Vagrant.configure(2) do |config|
         chef.nodes_path = "./nodes"
         chef.roles_path = "./roles"
         # Add a recipe
-        chef.add_recipe "haproxy"
+        # chef.add_recipe "haproxy"
 
         # Or maybe a role
-        # chef.add_role "web"
+        chef.add_role "webserver"
     end    
   end
 
