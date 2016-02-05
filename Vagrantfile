@@ -12,10 +12,11 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  
-  # config.vm.box = "puphpet/centos65-x64"
+
+  # config.vm.box = "puphpet/centos65-x64" # resolv.conf borked with this
   # config.vm.box =  "ubuntu/trusty64" 
-  config.vm.box = "hashicorp/precise64"
+  # config.vm.box = "hashicorp/precise64"
+  config.vm.box = "bento/ubuntu-14.04"
   config.vm.boot_timeout = 300
 
   config.vm.network "private_network", type: "dhcp"

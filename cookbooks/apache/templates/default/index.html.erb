@@ -1,0 +1,10 @@
+
+<html>
+  <body>
+    <h1>Hello, World from <%= node["fqdn"] %>!</h1>
+      <p>This Server has <%= node["memory"]["total"].to_i / 1024 %> MB Memory.</p>
+      <p>This Server has <%= node["memory"]["swap"]["free"].to_i / 1024 %> MB of swap free.</p>
+      <p>This Server is an <%= node["platform"] %> <%= node["platform_version"] %> server.</p>
+
+  </body>
+</html>
