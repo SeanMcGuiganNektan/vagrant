@@ -11,4 +11,4 @@ end
 template "#{node["document_root"]}/index.html" do
 	source "index.html.erb"
 	mode "0644"
-end
+end								

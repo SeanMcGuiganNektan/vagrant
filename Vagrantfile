@@ -16,7 +16,8 @@ Vagrant.configure(2) do |config|
   # config.vm.box = "puphpet/centos65-x64" # resolv.conf borked with this
   # config.vm.box =  "ubuntu/trusty64" 
   # config.vm.box = "hashicorp/precise64"
-  config.vm.box = "bento/ubuntu-14.04"
+  # config.vm.box = "bento/ubuntu-14.04"
+  config.vm.box = "threatstack/ubuntu-14.04-amd64" 
   config.vm.boot_timeout = 300
 
   config.vm.network "private_network", type: "dhcp"
@@ -36,14 +37,15 @@ Vagrant.configure(2) do |config|
     config.vm.hostname = "ha01"
     #  config.vm.network :private_network, ip: "10.0.2.10"
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
-    #  config.vm.network :forwarded_port, guest: 80, host: 8080
+    config.vm.network :forwarded_port, guest: 80, host: 8080
     
     ha01.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
         vb.customize ["modifyvm", :id, "--cpus", "2"]
     end
     
-    config.vm.provision "chef_zero" do |chef|
+  config.vm.provision "chef_zero" do |chef|
+        chef.version = "12.5.1"
         chef.node_name = "haproxy01"
         # Specify the local paths where Chef data is stored
         chef.cookbooks_path = "./cookbooks"
@@ -52,8 +54,8 @@ Vagrant.configure(2) do |config|
         chef.roles_path = "./roles"
         # Add a recipe
         # chef.add_recipe "haproxy"
-
-        # Or maybe a role
+   
+       # Or maybe a role
         chef.add_role "loadbalancer"
     end
   end
@@ -65,7 +67,7 @@ Vagrant.configure(2) do |config|
   config.vm.hostname = "web01"
     #  config.vm.network :private_network, ip: "10.0.2.20"
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
-    config.vm.network "forwarded_port", guest: 80, host: 8080
+    config.vm.network "forwarded_port", guest: 80, host: 8081
   
     web01.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
@@ -91,7 +93,7 @@ Vagrant.configure(2) do |config|
     config.vm.hostname = "web02"
     #  config.vm.network :private_network, ip: "10.0.2.30"
     #  config.vm.provision :shell, path: "bootstrap_apache.sh"
-    config.vm.network "forwarded_port", guest: 80, host: 8081
+    config.vm.network "forwarded_port", guest: 80, host: 8082
     
     web02.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
