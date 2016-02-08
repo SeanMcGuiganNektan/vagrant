@@ -75,6 +75,7 @@ Vagrant.configure(2) do |config|
     end
     
     config.vm.provision "chef_zero" do |chef|
+        chef.version = "12.5.1"
         chef.node_name = "web01"
         # Specify the local paths where Chef data is stored
         chef.cookbooks_path = "./cookbooks"
@@ -101,6 +102,7 @@ Vagrant.configure(2) do |config|
     end
     
     config.vm.provision "chef_zero" do |chef|
+        chef.version = "12.5.1"
         chef.node_name = "web02"
         # Specify the local paths where Chef data is stored
         chef.cookbooks_path = "./cookbooks"
@@ -114,6 +116,34 @@ Vagrant.configure(2) do |config|
         chef.add_role "webserver"
     end    
   end
+
+   config.vm.define "jenkins" do |jenkins|
+    config.vm.hostname = "jenkins"
+    #  config.vm.network :private_network, ip: "10.0.2.30"
+    #  config.vm.provision :shell, path: "bootstrap_apache.sh"
+    config.vm.network "forwarded_port", guest: 8080, host: 8084
+    
+    jenkins.vm.provider :virtualbox do |vb|
+        vb.customize ["modifyvm", :id, "--memory", "1024"]
+        vb.customize ["modifyvm", :id, "--cpus", "1"]
+    end
+    
+    config.vm.provision "chef_zero" do |chef|
+        chef.version = "12.5.1"
+        chef.node_name = "jenkins"
+        # Specify the local paths where Chef data is stored
+        chef.cookbooks_path = "./cookbooks"
+        chef.data_bags_path = "./data_bags"
+        chef.nodes_path = "./nodes"
+        chef.roles_path = "./roles"
+        # Add a recipe
+        # chef.add_recipe "haproxy"
+
+        # Or maybe a role
+        chef.add_role "jenkins"
+    end    
+  end
+  
 
   # config.vm.define "webserver03" do |web03|
   #  config.vm.hostname = "web03"
