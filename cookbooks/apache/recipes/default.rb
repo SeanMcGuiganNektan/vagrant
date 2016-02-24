@@ -1,5 +1,9 @@
 # Installs the Apache WebServer
 
+execute "update" do
+  command "sudo apt-get -y -q update"
+end
+
 package node["package_name"] do
   action :install
 end
